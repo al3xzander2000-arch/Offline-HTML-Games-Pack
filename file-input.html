@@ -106,18 +106,18 @@ iframe{
 <iframe id="file-content"></iframe>
 
 <script>
-const panel = document.getElementById("panel");
-const dropArea = document.getElementById("drop-area");
-const iframe = document.getElementById("file-content");
-const fileInput = document.getElementById("file-input");
-const htmlInput = document.getElementById("html-input");
-const runButton = document.getElementById("run-html");
-const fullscreenBtn = document.getElementById("fullscreen-btn");
+var panel = document.getElementById("panel");
+var dropArea = document.getElementById("drop-area");
+var iframe = document.getElementById("file-content");
+var fileInput = document.getElementById("file-input");
+var htmlInput = document.getElementById("html-input");
+var runButton = document.getElementById("run-html");
+var fullscreenBtn = document.getElementById("fullscreen-btn");
 
 function renderHTML(html) {
   htmlInput.value = '';
 
-  const doc =
+  var doc =
     iframe.contentDocument ||
     iframe.contentWindow.document;
 
@@ -132,7 +132,7 @@ function renderHTML(html) {
 function loadFile(file) {
   if (!file) return;
 
-  const reader = new FileReader();
+  var reader = new FileReader();
 
   reader.onload = function(e) {
     renderHTML(e.target.result);
@@ -162,7 +162,7 @@ dropArea.addEventListener("drop", e => {
   e.preventDefault();
   dropArea.classList.remove("drag");
 
-  const file = e.dataTransfer.files[0];
+  var file = e.dataTransfer.files[0];
   loadFile(file);
 });
 
@@ -186,4 +186,4 @@ fullscreenBtn.addEventListener("click", async () => {
 </script>
 
 </body>
-</html>
+</html> 

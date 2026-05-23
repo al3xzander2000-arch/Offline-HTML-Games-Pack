@@ -1,252 +1,189 @@
+<!--Place in a code editor.-->
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Load It</title>  
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Drag and Drop File</title>
 
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-    }
+<style>
+body{
+  margin:0;
+  font-family:sans-serif;
+  overflow:hidden;
+}
 
-    .textbox {
-      font-size: 12px;
-      width: 80%;
-      height: 100px;
-    }
+#panel{
+  width:420px;
+  padding:20px;
+  border:2px dashed #aaa;
+  text-align:center;
+  font-size:18px;
+  color:#555;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:#fff;
+  z-index:10;
+}
 
-    .button {
-      background-color: #04aa6d;
-      border: none;
-      color: #fff;
-      text-align: center;
-      padding: 10px 20px;
-      display: inline-block;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-  </style>
+#drop-area{
+  padding:40px 10px;
+  cursor:pointer;
+}
+
+#drop-area.drag{
+  background:#f0f0f0;
+}
+
+#html-input{
+  width:100%;
+  height:140px;
+  resize:vertical;
+  margin-top:15px;
+  box-sizing:border-box;
+  font-family:monospace;
+}
+
+#run-html{
+  margin-top:10px;
+  padding:10px 20px;
+  cursor:pointer;
+}
+
+#file-input{
+  display:none;
+}
+
+iframe{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  border:none;
+}
+
+#fullscreen-btn{
+  position:fixed;
+  top:5px;
+  left:5px;
+  width:15px;
+  height:15px;
+  border:none;
+  
+   
+  
+  font-size:10px;
+  cursor:pointer;
+  z-index:9999;
+  display:none;
+}
+</style>
 </head>
 
 <body>
 
-  <textarea
-    class="textbox"
-    id="textbox"
-    placeholder="Paste HTML here"
-  ></textarea>
+<div id="panel">
+
+  <div id="drop-area">
+    Drag HTML file here or click to upload
+  </div>
+
+  <input type="file" id="file-input" accept=".htm,.html">
+
+  <textarea id="html-input" placeholder="Or paste HTML code here..."></textarea>
 
   <br>
 
-  <!-- hidden file input -->
-  <input
-    type="file"
-    id="fileInput"
-    accept=".html,.htm"
-    style="display:none;"
-  >
-
-  <button
-    class="button"
-    onclick="document.getElementById('fileInput').click()"
-  >
-    Open HTML File
-  </button>
-
-  <button
-    class="button"
-    id="loadButton"
-    onclick="getHtml()"
-  >
-    Click me
-  </button>
-
-  <label>
-    <input
-      id="checkbox"
-      type="checkbox"
-      onclick="loadChunks()"
-    >
-    Use chunks
-  </label>
-       
-  <script>
-  
-   
-    (function() {
-
-      let chunkIndex = 1;
-      let chunks = [];
-
-      // stores uploaded html without rendering it
-      let uploadedHtml = "";
-
-      // file loader
-      document.getElementById("fileInput").addEventListener("change", function(e) {
-
-        const file = e.target.files[0];
-
-        if (!file) return;
-
-        const reader = new FileReader();
-
-        reader.onload = function(event) {
-
-          uploadedHtml = event.target.result;
-
-          console.log("HTML file loaded");
-        };
-
-        reader.readAsText(file);
-
-      });
-
-      window.loadChunks = function() {
-
-        const checkbox = document.getElementById("checkbox");
-        const button = document.getElementById("loadButton");
-
-        if (checkbox.checked) {
-
-          button.textContent = "Load Chunk " + chunkIndex;
-
-          if (!document.getElementById("addChunkButton")) {
-
-            const addChunkButton = document.createElement("button");
-
-            addChunkButton.textContent = "Add another chunk";
-            addChunkButton.id = "addChunkButton";
-            addChunkButton.className = "button";
-
-            addChunkButton.onclick = function () {
-
-              const textbox = document.getElementById("textbox");
-
-              var text = uploadedHtml || textbox.value.trim();
-
-              if (text) {
-
-                chunks.push(text);
-
-                text = "";
-
-                uploadedHtml = "";
-
-                chunkIndex++;
-
-                button.textContent = "Load Chunk " + chunkIndex;
-
-                textbox.value = "";
-              }
-            };
-
-            document.body.appendChild(document.createElement("br"));
-            document.body.appendChild(addChunkButton);
-          }
-
-        } else {
-
-          button.textContent = "Click me";
-
-          const existing = document.getElementById("addChunkButton");
-
-          if (existing) existing.remove();
-
-          chunkIndex = 1;
-          chunks = [];
-        }
-      };
-
-      window.getHtml = function() {
-
-        document.querySelectorAll("body *:not(iframe)").forEach(function(el) {
-          el.style.display = "none";
-        });
-
-       
- 
-      
-
-        const checkbox = document.getElementById("checkbox");
-        const textbox = document.getElementById("textbox");
-
-        if (checkbox.checked) {
-
-          const currentText = uploadedHtml || textbox.value.trim();
-
-          if (currentText) {
-
-            chunks.push(currentText);
-
-            uploadedHtml = "";
-
-            chunkIndex++;
-          }
-
-          
-
-            try {
-
-              var doc = document;
-             
-
-              //wi.eval(okmelon);
-
-              var fullHtml = chunks.join("");
-
-              textbox.value = "";
-
-              doc.open();
-              doc.write(fullHtml);
-              doc.close();
-
-              fullHtml = "";
-              chunks = [];
-
-            } catch (err) {
-
-              alert("Error writing HTML: " + err.message);
-            }
-          
-
-        } else {
-
-           
-
-            var doc = document;
-           
-  
-            //wi.eval(okmelon);
-
-            var inputHtml = uploadedHtml || textbox.value;
-   
-            try {
-
-              doc.open();
-              doc.write(inputHtml);
-              doc.close();
-
-              textbox.value = "";
-
-              uploadedHtml = "";
-
-              inputHtml = "";
-
-            } catch (err) {
-
-              alert("Error writing HTML: " + err.message);
-            }
-       
-        }
-      };
-
-    })();
-
-  </script>
+  <button id="run-html">Run HTML</button>
+
+</div>
+
+<button id="fullscreen-btn">F</button>
+
+<iframe id="file-content"></iframe>
+
+<script>
+const panel = document.getElementById("panel");
+const dropArea = document.getElementById("drop-area");
+const iframe = document.getElementById("file-content");
+const fileInput = document.getElementById("file-input");
+const htmlInput = document.getElementById("html-input");
+const runButton = document.getElementById("run-html");
+const fullscreenBtn = document.getElementById("fullscreen-btn");
+
+function renderHTML(html) {
+  htmlInput.value = '';
+
+  const doc =
+    iframe.contentDocument ||
+    iframe.contentWindow.document;
+
+  doc.open();
+  doc.write(html);
+  doc.close();
+
+  panel.style.display = "none";
+  fullscreenBtn.style.display = "block";
+}
+
+function loadFile(file) {
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    renderHTML(e.target.result);
+  };
+
+  reader.readAsText(file);
+}
+
+dropArea.addEventListener("click", () => {
+  fileInput.click();
+});
+
+fileInput.addEventListener("change", e => {
+  loadFile(e.target.files[0]);
+});
+
+dropArea.addEventListener("dragover", e => {
+  e.preventDefault();
+  dropArea.classList.add("drag");
+});
+
+dropArea.addEventListener("dragleave", () => {
+  dropArea.classList.remove("drag");
+});
+
+dropArea.addEventListener("drop", e => {
+  e.preventDefault();
+  dropArea.classList.remove("drag");
+
+  const file = e.dataTransfer.files[0];
+  loadFile(file);
+});
+
+runButton.addEventListener("click", () => {
+  renderHTML(htmlInput.value);
+});
+
+fullscreenBtn.addEventListener("click", async () => {
+  try {
+    if (iframe.requestFullscreen) {
+      await iframe.requestFullscreen();
+    } else if (iframe.webkitRequestFullscreen) {
+      iframe.webkitRequestFullscreen();
+    } else if (iframe.msRequestFullscreen) {
+      iframe.msRequestFullscreen();
+    }
+  } catch (err) {
+    console.error(err);
+  }
+});
+</script>
 
 </body>
 </html>
